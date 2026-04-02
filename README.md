@@ -70,6 +70,16 @@ $ deb-s3 upload --bucket my-bucket my-deb-package-1.0.0_amd64.deb
 >> Update complete.
 ```
 
+For Google Cloud Storage (or other S3-compatible endpoints) you need to disable
+SDK checksum negotiation headers and set visbility settings to nil:
+
+```console
+$ deb-s3 upload --bucket my-bucket --endpoint https://storage.googleapis.com --checksum-when-required --visibility nil my-deb-package-1.0.0_amd64.deb 
+```
+
+This flag keeps uploads on the same PutObject code path, but configures the AWS SDK
+to only send request checksums when required by the API.
+
 ```
 Usage:
   deb-s3 upload FILES

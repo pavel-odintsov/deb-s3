@@ -118,6 +118,11 @@ class Deb::S3::CLI < Thor
   :aliases  => "-C",
   :desc     => "Add cache-control headers to S3 objects."
 
+  class_option :checksum_when_required,
+  :default  => false,
+  :type     => :boolean,
+  :desc     => "Disable SDK upload checksums for S3-compatible endpoints (for example Google Cloud Storage)."
+
   desc "upload FILES",
   "Uploads the given files to a S3 bucket as an APT repository."
 
@@ -776,6 +781,10 @@ class Deb::S3::CLI < Thor
       :force_path_style => options[:force_path_style]
     }
     settings[:endpoint] = options[:endpoint] if options[:endpoint]
+    if options[:checksum_when_required]
+      # GCS can reject AWS SDK checksum negotiation headers for PutObject.
+      settings[:request_checksum_calculation] = "when_required"
+    end
     settings.merge!(provider)
 
     Deb::S3::Utils.s3           = Aws::S3::Client.new(settings)
